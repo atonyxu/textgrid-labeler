@@ -44,7 +44,9 @@ class TextGridLabeler(
         self.search_results: List[int] = []
         self.search_index: int = -1
         self.search_var = tk.StringVar()
-        self.search_var.trace_add("write", lambda *a: self._on_search_changed())
+
+        # List selection
+        self.selected_idx: int = -1
 
         # Ruler
         self.ruler_w = 28

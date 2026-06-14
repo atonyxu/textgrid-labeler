@@ -112,7 +112,9 @@ class EventHandlerMixin:
                     iv.maxTime = right.maxTime
                     del tier.intervals[i + 1]
                     self.modified = True
+                    self.selected_idx = -1
                     self._update_view()
+                    self._populate_annotation_list()
                     self.set_status(f"Deleted boundary at {bound_time:.3f}s")
                     return
             return
@@ -155,6 +157,7 @@ class EventHandlerMixin:
     def _on_canvas_release(self, event):
         if self.dragging:
             self.dragging = False
+            self._populate_annotation_list()
             self.set_status("Boundary updated")
 
     def _on_annot_double_click(self, event):
@@ -182,7 +185,9 @@ class EventHandlerMixin:
         if new_text is not None:
             interval.mark = new_text
             self.modified = True
+            self.selected_idx = -1
             self._update_view()
+            self._populate_annotation_list()
             self.set_status(f"Label updated: {new_text}")
 
     def _on_mousewheel(self, event):
@@ -235,4 +240,5 @@ class EventHandlerMixin:
 
         self.modified = True
         self._update_view()
+        self._populate_annotation_list()
         self.set_status(f"Added boundary at {time:.3f}s")

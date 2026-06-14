@@ -3,6 +3,7 @@ class ViewManagerMixin:
         if not self.textgrid:
             return
 
+        self.selected_idx = -1
         total_dur = self.textgrid.maxTime
         if self.audio_data.is_loaded():
             total_dur = max(total_dur, self.audio_data.duration)
@@ -19,6 +20,7 @@ class ViewManagerMixin:
 
         self._update_scrollbar()
         self._update_view()
+        self._populate_annotation_list()
 
     def _update_view(self):
         self._draw_annotation_bar()
@@ -34,8 +36,10 @@ class ViewManagerMixin:
             self.current_tier_index = idx
             self.search_results = []
             self.search_index = -1
+            self.selected_idx = -1
             self._update_search_display(redraw=False)
             self._update_view()
+            self._populate_annotation_list()
             self.set_status(f"Selected layer: {self.layer_combo.get()}")
 
     def _on_resize(self, event=None):
@@ -91,3 +95,50 @@ class ViewManagerMixin:
         self.time_label.config(
             text=f"{self.visible_start:.3f}s - {end_t:.3f}s / {total:.3f}s"
         )
+
+    def _populate_annotation_list(self):
+        for item in self.annot_tree.get_children():
+            self.annot_tree.delete(item)
+
+        tier = self._get_current_tier()
+        if not tier or not hasattr(tier, "intervals"):
+            return
+
+        query = self.search_var.get().strip().lower()
+
+        for i, interval in enumerate(tier.intervals):
+            if query and query not in interval.mark.lower():
+                continue
+            dur_ms = (interval.maxTime - interval.minTime) * 1000
+            self.annot_tree.insert("", "end", iid=str(i),
+                                   values=(interval.mark or "(sil)",
+                                           f"{interval.minTime:.3f}",
+                                           f"{dur_ms:.0f}"))
+
+    def _on_annotation_selected(self, event):
+        sel = self.annot_tree.selection()
+        if not sel:
+            return
+        idx = int(sel[0])
+        tier = self._get_current_tier()
+        if not tier or idx >= len(tier.intervals):
+            return
+        interval = tier.intervals[idx]
+        center = (interval.minTime + interval.maxTime) / 2
+        self.visible_start = center - self.visible_duration / 2
+        self._clamp_view()
+        self.selected_idx = idx
+
+        if self.search_results:
+            try:
+                self.search_index = self.search_results.index(idx)
+            except ValueError:
+                self.search_results = [idx]
+                self.search_index = 0
+                self._populate_annotation_list()
+        else:
+            self.search_results = [idx]
+            self.search_index = 0
+
+        self._update_search_display(redraw=False)
+        self._update_view()

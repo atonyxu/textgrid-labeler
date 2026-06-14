@@ -36,7 +36,14 @@ class DrawingMixin:
                 idx = self.search_index % len(self.search_results)
                 is_current_search = (i == self.search_results[idx])
 
-            fill_color = "#4a4020" if is_current_search else ("#353535" if not is_search_match else "#3a3a3a")
+            is_selected = (i == self.selected_idx)
+
+            if is_current_search or is_selected:
+                fill_color = "#4a4020"
+            elif is_search_match:
+                fill_color = "#3a3a3a"
+            else:
+                fill_color = "#353535"
 
             self.annot_canvas.create_rectangle(x1, 0, x2, h,
                                                 fill=fill_color,
@@ -44,10 +51,11 @@ class DrawingMixin:
 
             if x2 - x1 > 10:
                 display_text = interval.mark if interval.mark else "(sil)"
+                text_color = self.search_hl if (is_current_search or is_selected) else self.fg_color
                 self.annot_canvas.create_text(
                     (x1 + x2) / 2, h / 2,
                     text=display_text,
-                    fill=self.search_hl,
+                    fill=text_color,
                     font=("Segoe UI", 12, "bold"),
                     width=max(10, x2 - x1 - 4),
                     anchor=tk.CENTER
@@ -153,6 +161,10 @@ class DrawingMixin:
                     if self.search_results and self.search_index >= 0:
                         sidx = self.search_results[self.search_index % len(self.search_results)]
                         interval = tier.intervals[sidx]
+                        if abs(t - interval.minTime) < 0.001 or abs(t - interval.maxTime) < 0.001:
+                            highlight = True
+                    if self.selected_idx >= 0 and self.selected_idx < len(tier.intervals):
+                        interval = tier.intervals[self.selected_idx]
                         if abs(t - interval.minTime) < 0.001 or abs(t - interval.maxTime) < 0.001:
                             highlight = True
 
