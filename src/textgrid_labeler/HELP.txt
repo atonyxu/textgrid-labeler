@@ -1,40 +1,53 @@
 ╌╌╌ TextGrid Labeler User Guide ╌╌╌
 
 [File Operations]
-  • Ctrl+O        Open TextGrid (auto-loads WAV from same directory)
-  • Ctrl+W        Manually open WAV audio file
-  • Ctrl+S        Save TextGrid
-  • Ctrl+Shift+S  Save TextGrid as new file
+  • Ctrl+N          New TextGrid (from template or default words/phones tiers)
+  • Ctrl+Shift+N    New from Current (clone current file's tier structure, clear labels)
+  • Ctrl+O          Open TextGrid (auto-loads WAV from same / parent / wav/ directory)
+  • Ctrl+W          Manually open WAV audio file
+  • Ctrl+S          Save TextGrid
+  • Ctrl+Shift+S    Save TextGrid as new file
+  • Recent Files    Submenu listing recently opened files; click to reopen
+  • Project menu    Lists all .TextGrid files in the current file's directory for quick switching
 
 [Annotation Editing]
-  • Click & drag a boundary line in the waveform to adjust its position
-  • Double-click a boundary line to delete it (merges intervals, keeps left label)
-  • Double-click inside an interval in the waveform to add a new boundary (prompts for label)
-  • Double-click an interval in the annotation bar (top strip) to edit its label
-  • Right-click an interval in the waveform to play its audio
+  • Click & drag a red boundary line         Adjust boundary position
+  • Double-click a red boundary line         Delete boundary (merges intervals, keeps left label)
+  • Double-click inside an interval          Add new boundary (prompts for label)
+  • Double-click a label in annotation bar   Edit interval label
+  • Right-click an interval in waveform      Play audio for that segment
 
 [Search & Navigation]
-  • Type a keyword + press Enter to search labels (substring match)
-  • ◀/▶ buttons to jump to previous/next search result
-  • Click an item in the right-side annotation list to jump to that interval
+  • Type keyword + press Enter    Search interval labels (substring match)
+  • ◀ / ▶ buttons                 Jump to previous / next search result
+  • Click annotation list item    Jump to and highlight that interval
+  • Count label                   Shows "N/M" for current search position
+
+[Annotation List (right panel)]
+  • Three columns: Label, Start (s), Dur (ms)
+  • Automatically filters when search is active
+  • Click any item to jump to and highlight that interval
+  • Selection synced with search navigation
 
 [View Operations]
-  • Mouse wheel           Horizontal scroll
-  • Ctrl + Mouse wheel    Zoom in/out
-  • Bottom scroll bar     Horizontal scroll
-  • dB ruler on right     Shows audio amplitude levels
+  • Mouse wheel              Horizontal scroll
+  • Ctrl + mouse wheel       Zoom in / out (centered on cursor)
+  • Bottom scroll bar        Horizontal scroll
+  • dB ruler on right        Shows audio amplitude levels (0 to -48 dB)
 
 [Undo & Redo]
-  • Ctrl+Z  Undo
-  • Ctrl+Y  Redo
+  • Ctrl+Z    Undo last edit
+  • Ctrl+Y    Redo last undone edit
+  • History   Up to 100 steps; cleared when opening a new file
 
 [Layer Switching]
-  • Dropdown in toolbar   Switch the current editing layer
+  • Dropdown in toolbar   Switch the current editing layer (tier)
 
 [FAQ]
-  • WAV auto-load priority:
-    1. Same directory as TextGrid  →  same-named.wav
-    2. Parent directory            →  same-named.wav
-    3. wav/wavs/WAV/WAVS subdir under parent  →  same-named.wav
-  • The title bar shows * when there are unsaved changes
-  • Closing the window prompts to save unsaved changes
+  • WAV auto-load priority for a TextGrid at path/to/file.TextGrid:
+    1. path/to/file.wav
+    2. path/file.wav
+    3. path/wav/file.wav, path/wavs/file.wav, path/WAV/file.wav, path/WAVS/file.wav
+  • The status bar shows current file and operation feedback
+  • Closing the window or opening another file prompts to save unsaved changes
+  • Template.TextGrid: if present beside the executable, used as tier template for New TextGrid
