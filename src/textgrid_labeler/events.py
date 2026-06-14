@@ -2,6 +2,7 @@ from tkinter import simpledialog, messagebox
 from typing import List, Tuple
 
 import textgrid
+import copy
 
 
 class EventHandlerMixin:
@@ -60,6 +61,43 @@ class EventHandlerMixin:
             return len(tier.intervals) - 1
         return -1
 
+    def _save_state(self):
+        if self.textgrid is None:
+            return
+        self.undo_stack.append(copy.deepcopy(self.textgrid))
+        self.redo_stack.clear()
+        if len(self.undo_stack) > 100:
+            self.undo_stack.pop(0)
+        return
+
+    def _undo(self):
+        if not self.undo_stack:
+            return
+        self.redo_stack.append(copy.deepcopy(self.textgrid))
+        self.textgrid = self.undo_stack.pop()
+        self.modified = True
+        self.search_results = []
+        self.search_index = -1
+        self.selected_idx = -1
+        self._update_search_display(redraw=False)
+        self._update_view()
+        self._populate_annotation_list()
+        self.set_status("Undo")
+
+    def _redo(self):
+        if not self.redo_stack:
+            return
+        self.undo_stack.append(copy.deepcopy(self.textgrid))
+        self.textgrid = self.redo_stack.pop()
+        self.modified = True
+        self.search_results = []
+        self.search_index = -1
+        self.selected_idx = -1
+        self._update_search_display(redraw=False)
+        self._update_view()
+        self._populate_annotation_list()
+        self.set_status("Redo")
+
     def _on_canvas_click(self, event):
         if not self.textgrid:
             return
@@ -70,6 +108,7 @@ class EventHandlerMixin:
 
         bound_time, found = self._find_nearest_boundary(click_time, max_dist=0.05)
         if found:
+            self._save_state()
             min_t, max_t = self._find_boundary_constraints(bound_time, tier)
             self.dragging = True
             self.drag_boundary_time = bound_time
@@ -108,6 +147,7 @@ class EventHandlerMixin:
                     if not messagebox.askyesno("Delete Boundary",
                                                f"Delete boundary at {bound_time:.3f}s and merge intervals?"):
                         return
+                    self._save_state()
                     right = tier.intervals[i + 1]
                     iv.maxTime = right.maxTime
                     del tier.intervals[i + 1]
@@ -182,7 +222,8 @@ class EventHandlerMixin:
             initialvalue=interval.mark,
             parent=self
         )
-        if new_text is not None:
+        if new_text is not None and new_text != interval.mark:
+            self._save_state()
             interval.mark = new_text
             self.modified = True
             self.selected_idx = -1
@@ -232,6 +273,7 @@ class EventHandlerMixin:
 
         if not text:
             text = interval.mark
+        self._save_state()
         old_xmax = interval.maxTime
         interval.maxTime = time
 

@@ -136,6 +136,7 @@ class ViewManagerMixin:
                 self.search_results = [idx]
                 self.search_index = 0
                 self._populate_annotation_list()
+                self.annot_tree.selection_set(str(idx))
         else:
             self.search_results = [idx]
             self.search_index = 0

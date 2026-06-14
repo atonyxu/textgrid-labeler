@@ -35,6 +35,8 @@ class FileOperationsMixin:
             self.textgrid = textgrid.TextGrid.fromFile(path)
             self.textgrid_path = path
             self.modified = False
+            self.undo_stack.clear()
+            self.redo_stack.clear()
 
             wav_path = self._find_wav(path)
             if wav_path:

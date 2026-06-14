@@ -24,6 +24,11 @@ class UIBuilder:
         file_menu.add_command(label="Exit", command=self._on_close)
         menubar.add_cascade(label="File", menu=file_menu)
 
+        edit_menu = tk.Menu(menubar, tearoff=0)
+        edit_menu.add_command(label="Undo", command=self._undo, accelerator="Ctrl+Z")
+        edit_menu.add_command(label="Redo", command=self._redo, accelerator="Ctrl+Y")
+        menubar.add_cascade(label="Edit", menu=edit_menu)
+
         help_menu = tk.Menu(menubar, tearoff=0)
         help_menu.add_command(label="About", command=self._show_about)
         menubar.add_cascade(label="Help", menu=help_menu)
@@ -33,6 +38,10 @@ class UIBuilder:
         self.bind_all("<Control-s>", lambda e: self._save_textgrid())
         self.bind_all("<Control-Shift-S>", lambda e: self._save_as_textgrid())
         self.bind_all("<Control-Shift-s>", lambda e: self._save_as_textgrid())
+        self.bind_all("<Control-z>", lambda e: self._undo())
+        self.bind_all("<Control-Z>", lambda e: self._undo())
+        self.bind_all("<Control-y>", lambda e: self._redo())
+        self.bind_all("<Control-Y>", lambda e: self._redo())
 
     def _build_toolbar(self):
         toolbar = tk.Frame(self, height=40)

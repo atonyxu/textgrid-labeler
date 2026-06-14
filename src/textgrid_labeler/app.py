@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import messagebox
 import textgrid
+import copy
 from typing import List, Optional
 
 from .audio import AudioData
@@ -50,6 +51,10 @@ class TextGridLabeler(
 
         # Ruler
         self.ruler_w = 28
+
+        # Undo/redo
+        self.undo_stack: List[str] = []
+        self.redo_stack: List[str] = []
 
         # Drag state
         self.dragging = False
