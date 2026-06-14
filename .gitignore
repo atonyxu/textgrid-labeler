@@ -3,6 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+*.TextGrid
+*.wav
+
 # C extensions
 *.so
 
