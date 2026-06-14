@@ -26,11 +26,14 @@ class TextGridLabeler(
     SearchMixin,
     tk.Tk,
 ):
-    def __init__(self):
+    def __init__(self, filepath: str = ""):
         tk.Tk.__init__(self)
         self.title("TextGrid Labeler")
         self.geometry("1200x700")
         self.minsize(800, 500)
+
+        if filepath and _os.path.exists(filepath):
+            self.after(10, self._load_textgrid, filepath)
 
         # Data
         self.textgrid: Optional[textgrid.TextGrid] = None

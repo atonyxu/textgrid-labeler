@@ -8,5 +8,6 @@ from textgrid_labeler import TextGridLabeler
 
 
 if __name__ == "__main__":
-    app = TextGridLabeler()
+    path = sys.argv[1] if len(sys.argv) > 1 else ""
+    app = TextGridLabeler(filepath=path)
     app.run()
