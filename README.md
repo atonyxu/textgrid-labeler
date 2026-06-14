@@ -37,7 +37,11 @@ pip install -r requirements.txt
 ## Usage
 
 ```bash
-python texgrid_labeler.py
+# Via package module
+python -m textgrid_labeler
+
+# Or directly via run script
+python run.py
 ```
 
 ### Keyboard shortcuts
