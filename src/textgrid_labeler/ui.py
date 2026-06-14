@@ -1,3 +1,4 @@
+import os as _os
 import tkinter as tk
 from tkinter import ttk
 
@@ -21,6 +22,10 @@ class UIBuilder:
         file_menu.add_command(label="Save TextGrid", command=self._save_textgrid, accelerator="Ctrl+S")
         file_menu.add_command(label="Save as New TextGrid", command=self._save_as_textgrid, accelerator="Ctrl+Shift+S")
         file_menu.add_separator()
+        self.recent_menu = tk.Menu(file_menu, tearoff=0)
+        file_menu.add_cascade(label="Recent Files", menu=self.recent_menu)
+        self._update_recent_menu()
+        file_menu.add_separator()
         file_menu.add_command(label="Exit", command=self._on_close)
         menubar.add_cascade(label="File", menu=file_menu)
 
@@ -30,6 +35,8 @@ class UIBuilder:
         menubar.add_cascade(label="Edit", menu=edit_menu)
 
         help_menu = tk.Menu(menubar, tearoff=0)
+        help_menu.add_command(label="User Guide", command=self._show_help)
+        help_menu.add_separator()
         help_menu.add_command(label="About", command=self._show_about)
         menubar.add_cascade(label="Help", menu=help_menu)
 
@@ -42,6 +49,17 @@ class UIBuilder:
         self.bind_all("<Control-Z>", lambda e: self._undo())
         self.bind_all("<Control-y>", lambda e: self._redo())
         self.bind_all("<Control-Y>", lambda e: self._redo())
+
+    def _update_recent_menu(self):
+        self.recent_menu.delete(0, "end")
+        if not self.recent_files:
+            self.recent_menu.add_command(label="(no recent files)", state=tk.DISABLED)
+            return
+        for path in self.recent_files:
+            name = _os.path.basename(path)
+            self.recent_menu.add_command(
+                label=name, command=lambda p=path: self._open_recent(p)
+            )
 
     def _build_toolbar(self):
         toolbar = tk.Frame(self, height=40)

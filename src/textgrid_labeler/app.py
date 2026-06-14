@@ -1,3 +1,5 @@
+import json
+import os as _os
 import tkinter as tk
 from tkinter import messagebox
 import textgrid
@@ -56,6 +58,11 @@ class TextGridLabeler(
         self.undo_stack: List[str] = []
         self.redo_stack: List[str] = []
 
+        # Recent files
+        self.recent_files: List[str] = []
+        self._recent_limit = 10
+        self._load_recent()
+
         # Drag state
         self.dragging = False
         self.drag_boundary_time: float = 0.0
@@ -87,6 +94,64 @@ class TextGridLabeler(
 
     def set_status(self, text: str):
         self.status_bar.config(text=text)
+
+    def _recent_dir(self) -> str:
+        d = _os.path.join(_os.path.expanduser("~"), ".textgrid-labeler")
+        _os.makedirs(d, exist_ok=True)
+        return d
+
+    def _recent_path(self) -> str:
+        return _os.path.join(self._recent_dir(), "recent.json")
+
+    def _load_recent(self):
+        p = self._recent_path()
+        try:
+            with open(p, encoding="utf-8") as f:
+                data = json.load(f)
+            self.recent_files = [e for e in data if _os.path.exists(e)][:self._recent_limit]
+        except Exception:
+            self.recent_files = []
+
+    def _save_recent(self):
+        p = self._recent_path()
+        try:
+            with open(p, "w", encoding="utf-8") as f:
+                json.dump(self.recent_files, f, ensure_ascii=False)
+        except Exception:
+            pass
+
+    def _add_recent(self, path: str):
+        if not path:
+            return
+        self.recent_files = [e for e in self.recent_files if e != path]
+        self.recent_files.insert(0, path)
+        self.recent_files = self.recent_files[:self._recent_limit]
+        self._save_recent()
+        self._update_recent_menu()
+
+    def _show_help(self):
+        import os as _os
+        help_path = _os.path.join(_os.path.dirname(__file__), "HELP.txt")
+        try:
+            with open(help_path, encoding="utf-8") as f:
+                text = f.read()
+        except Exception:
+            text = "Help file not found."
+        from tkinter.scrolledtext import ScrolledText
+        win = tk.Toplevel(self)
+        win.title("User Guide - TextGrid Labeler")
+        win.geometry("620x560")
+        win.minsize(480, 400)
+        win.transient(self)
+        win.grab_set()
+        txt = ScrolledText(win, wrap=tk.WORD, font=("Consolas", 10),
+                           padx=12, pady=12, bg="#fafafa", fg="#222")
+        txt.pack(fill=tk.BOTH, expand=True)
+        txt.insert(tk.END, text)
+        txt.config(state=tk.DISABLED)
+        btn = tk.Button(win, text="Close", command=win.destroy,
+                        font=("Segoe UI", 10))
+        btn.pack(pady=(0, 10))
 
     def _show_about(self):
         messagebox.showinfo("About TextGrid Labeler",

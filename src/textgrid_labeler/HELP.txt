@@ -1,0 +1,40 @@
+╌╌╌ TextGrid Labeler User Guide ╌╌╌
+
+[File Operations]
+  • Ctrl+O        Open TextGrid (auto-loads WAV from same directory)
+  • Ctrl+W        Manually open WAV audio file
+  • Ctrl+S        Save TextGrid
+  • Ctrl+Shift+S  Save TextGrid as new file
+
+[Annotation Editing]
+  • Click & drag a boundary line in the waveform to adjust its position
+  • Double-click a boundary line to delete it (merges intervals, keeps left label)
+  • Double-click inside an interval in the waveform to add a new boundary (prompts for label)
+  • Double-click an interval in the annotation bar (top strip) to edit its label
+  • Right-click an interval in the waveform to play its audio
+
+[Search & Navigation]
+  • Type a keyword + press Enter to search labels (substring match)
+  • ◀/▶ buttons to jump to previous/next search result
+  • Click an item in the right-side annotation list to jump to that interval
+
+[View Operations]
+  • Mouse wheel           Horizontal scroll
+  • Ctrl + Mouse wheel    Zoom in/out
+  • Bottom scroll bar     Horizontal scroll
+  • dB ruler on right     Shows audio amplitude levels
+
+[Undo & Redo]
+  • Ctrl+Z  Undo
+  • Ctrl+Y  Redo
+
+[Layer Switching]
+  • Dropdown in toolbar   Switch the current editing layer
+
+[FAQ]
+  • WAV auto-load priority:
+    1. Same directory as TextGrid  →  same-named.wav
+    2. Parent directory            →  same-named.wav
+    3. wav/wavs/WAV/WAVS subdir under parent  →  same-named.wav
+  • The title bar shows * when there are unsaved changes
+  • Closing the window prompts to save unsaved changes
