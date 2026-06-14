@@ -31,6 +31,7 @@ class TextGridLabeler(
         self.title("TextGrid Labeler")
         self.geometry("1200x700")
         self.minsize(800, 500)
+        self.state("zoomed")
 
         if filepath and _os.path.exists(filepath):
             self.after(10, self._load_textgrid, filepath)

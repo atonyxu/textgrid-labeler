@@ -143,3 +143,28 @@ class ViewManagerMixin:
 
         self._update_search_display(redraw=False)
         self._update_view()
+
+    def _on_annot_list_double_click(self, event):
+        sel = self.annot_tree.selection()
+        if not sel:
+            return
+        idx = int(sel[0])
+        tier = self._get_current_tier()
+        if not tier or idx >= len(tier.intervals):
+            return
+        interval = tier.intervals[idx]
+        from tkinter import simpledialog
+        new_text = simpledialog.askstring(
+            "Edit Label",
+            f"Edit label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
+            initialvalue=interval.mark,
+            parent=self
+        )
+        if new_text is not None and new_text != interval.mark:
+            self._save_state()
+            interval.mark = new_text
+            self.modified = True
+            self.selected_idx = -1
+            self._update_view()
+            self._populate_annotation_list()
+            self.set_status(f"Label updated: {new_text}")

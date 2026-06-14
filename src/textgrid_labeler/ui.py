@@ -16,11 +16,11 @@ class UIBuilder:
         self.config(menu=menubar)
 
         file_menu = tk.Menu(menubar, tearoff=0)
-        file_menu.add_command(label="New TextGrid", command=self._new_textgrid, accelerator="Ctrl+N")
-        file_menu.add_command(label="New from Current", command=self._new_from_current, accelerator="Ctrl+Shift+N")
-        file_menu.add_separator()
         file_menu.add_command(label="Open TextGrid", command=self._open_textgrid, accelerator="Ctrl+O")
         file_menu.add_command(label="Open WAV", command=self._open_wav, accelerator="Ctrl+W")
+        file_menu.add_separator()
+        file_menu.add_command(label="New TextGrid", command=self._new_textgrid, accelerator="Ctrl+N")
+        file_menu.add_command(label="New from Current", command=self._new_from_current, accelerator="Ctrl+Shift+N")
         file_menu.add_separator()
         file_menu.add_command(label="Save TextGrid", command=self._save_textgrid, accelerator="Ctrl+S")
         file_menu.add_command(label="Save as New TextGrid", command=self._save_as_textgrid, accelerator="Ctrl+Shift+S")
@@ -185,6 +185,7 @@ class UIBuilder:
         self.annot_tree.configure(yscrollcommand=scroll.set)
 
         self.annot_tree.bind("<<TreeviewSelect>>", self._on_annotation_selected)
+        self.annot_tree.bind("<Double-Button-1>", self._on_annot_list_double_click)
 
     def _build_scrollbar(self):
         scroll_frame = tk.Frame(self)
