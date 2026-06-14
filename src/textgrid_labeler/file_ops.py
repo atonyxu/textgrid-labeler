@@ -1,4 +1,5 @@
 import os
+import sys
 from tkinter import filedialog, messagebox
 
 import textgrid
@@ -94,6 +95,97 @@ class FileOperationsMixin:
             self.set_status(f"Loaded WAV: {os.path.basename(path)}")
         except Exception as e:
             messagebox.showerror("Error", f"Failed to open WAV:\n{e}")
+
+    def _find_template(self) -> str:
+        candidates = []
+        if getattr(sys, "frozen", False):
+            candidates.append(os.path.join(os.path.dirname(sys.executable), "template.TextGrid"))
+        candidates.append(os.path.join(os.path.dirname(__file__), "..", "..", "template.TextGrid"))
+        candidates.append(os.path.join(os.path.dirname(__file__), "template.TextGrid"))
+        for c in candidates:
+            if os.path.exists(c):
+                return c
+        return ""
+
+    def _new_textgrid(self):
+        if not self._confirm_discard():
+            return
+        template_path = self._find_template()
+        if template_path:
+            try:
+                ref = textgrid.TextGrid.fromFile(template_path)
+                tg = textgrid.TextGrid(maxTime=ref.maxTime or 1.0)
+                for t in ref.tiers:
+                    if hasattr(t, "intervals"):
+                        new_tier = textgrid.IntervalTier(
+                            name=t.name, minTime=tg.minTime, maxTime=tg.maxTime
+                        )
+                        new_tier.intervals.append(
+                            textgrid.Interval(tg.minTime, tg.maxTime, "")
+                        )
+                        tg.tiers.append(new_tier)
+                    elif hasattr(t, "points"):
+                        new_tier = textgrid.PointTier(
+                            name=t.name, minTime=tg.minTime, maxTime=tg.maxTime
+                        )
+                        tg.tiers.append(new_tier)
+                self.textgrid = tg
+                self.textgrid_path = ""
+                self.modified = False
+                self.undo_stack.clear()
+                self.redo_stack.clear()
+                self.audio_data.unload()
+                self._on_data_loaded()
+                self._update_project_menu()
+                self.set_status("Created new TextGrid from template")
+                return
+            except Exception as e:
+                messagebox.showerror("Template Error", f"Failed to load template:\n{e}")
+
+        tg = textgrid.TextGrid(maxTime=1.0)
+        for name in ("words", "phones"):
+            tier = textgrid.IntervalTier(name=name, minTime=0, maxTime=1.0)
+            tier.intervals.append(textgrid.Interval(0, 1.0, ""))
+            tg.tiers.append(tier)
+        self.textgrid = tg
+        self.textgrid_path = ""
+        self.modified = False
+        self.undo_stack.clear()
+        self.redo_stack.clear()
+        self.audio_data.unload()
+        self._on_data_loaded()
+        self._update_project_menu()
+        self.set_status("Created new TextGrid")
+
+    def _new_from_current(self):
+        if not self.textgrid:
+            messagebox.showinfo("Info", "No file open to use as template.")
+            return
+        if not self._confirm_discard():
+            return
+        tg = textgrid.TextGrid(maxTime=self.textgrid.maxTime or 1.0)
+        for t in self.textgrid.tiers:
+            if hasattr(t, "intervals"):
+                new_tier = textgrid.IntervalTier(
+                    name=t.name, minTime=tg.minTime, maxTime=tg.maxTime
+                )
+                new_tier.intervals.append(
+                    textgrid.Interval(tg.minTime, tg.maxTime, "")
+                )
+                tg.tiers.append(new_tier)
+            elif hasattr(t, "points"):
+                new_tier = textgrid.PointTier(
+                    name=t.name, minTime=tg.minTime, maxTime=tg.maxTime
+                )
+                tg.tiers.append(new_tier)
+        self.textgrid = tg
+        self.textgrid_path = ""
+        self.modified = False
+        self.undo_stack.clear()
+        self.redo_stack.clear()
+        self._on_data_loaded()
+        self._update_project_menu()
+        self.set_status("Created new TextGrid from current file")
 
     def _save_textgrid(self):
         if not self.textgrid:

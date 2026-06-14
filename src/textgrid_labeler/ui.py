@@ -16,6 +16,9 @@ class UIBuilder:
         self.config(menu=menubar)
 
         file_menu = tk.Menu(menubar, tearoff=0)
+        file_menu.add_command(label="New TextGrid", command=self._new_textgrid, accelerator="Ctrl+N")
+        file_menu.add_command(label="New from Current", command=self._new_from_current, accelerator="Ctrl+Shift+N")
+        file_menu.add_separator()
         file_menu.add_command(label="Open TextGrid", command=self._open_textgrid, accelerator="Ctrl+O")
         file_menu.add_command(label="Open WAV", command=self._open_wav, accelerator="Ctrl+W")
         file_menu.add_separator()
@@ -45,6 +48,10 @@ class UIBuilder:
         menubar.add_cascade(label="Help", menu=help_menu)
 
         self.bind_all("<Control-o>", lambda e: self._open_textgrid())
+        self.bind_all("<Control-n>", lambda e: self._new_textgrid())
+        self.bind_all("<Control-N>", lambda e: self._new_textgrid())
+        self.bind_all("<Control-Shift-n>", lambda e: self._new_from_current())
+        self.bind_all("<Control-Shift-N>", lambda e: self._new_from_current())
         self.bind_all("<Control-w>", lambda e: self._open_wav())
         self.bind_all("<Control-s>", lambda e: self._save_textgrid())
         self.bind_all("<Control-Shift-S>", lambda e: self._save_as_textgrid())
@@ -127,7 +134,7 @@ class UIBuilder:
         self.btn_next.pack(side=tk.LEFT, padx=1)
 
         self.search_count_label = tk.Label(right_frame, text="",
-                                            font=("Segoe UI", 9))
+                                             font=("Segoe UI", 9))
         self.search_count_label.pack(side=tk.LEFT, padx=(4, 0))
 
     def _build_canvases(self):
@@ -164,7 +171,9 @@ class UIBuilder:
 
         columns = ("label", "start", "dur")
         self.annot_tree = ttk.Treeview(panel, columns=columns, show="headings",
-                                        height=12)
+                                        height=12, style="Annot.Treeview")
+        style = ttk.Style(self)
+        style.configure("Annot.Treeview", font=("Segoe UI", 9))
         self.annot_tree.heading("label", text="Label")
         self.annot_tree.heading("start", text="Start (s)")
         self.annot_tree.heading("dur", text="Dur (ms)")

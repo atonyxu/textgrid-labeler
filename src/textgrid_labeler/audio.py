@@ -82,6 +82,16 @@ class AudioData:
     def is_loaded(self) -> bool:
         return self.samples is not None and len(self.samples) > 0
 
+    def unload(self):
+        self.filepath = ""
+        self.sample_rate = 0
+        self.n_channels = 0
+        self.sample_width = 0
+        self.n_frames = 0
+        self.duration = 0.0
+        self.max_possible = 1.0
+        self.samples = None
+
     def get_section(self, start_time: float, end_time: float) -> np.ndarray:
         if not self.is_loaded():
             return None
