@@ -134,7 +134,7 @@ class UIBuilder:
         self.btn_next.pack(side=tk.LEFT, padx=1)
 
         self.search_count_label = tk.Label(right_frame, text="",
-                                             font=("Segoe UI", 9))
+                                            font=("Segoe UI", 9))
         self.search_count_label.pack(side=tk.LEFT, padx=(4, 0))
 
     def _build_canvases(self):
@@ -171,9 +171,7 @@ class UIBuilder:
 
         columns = ("label", "start", "dur")
         self.annot_tree = ttk.Treeview(panel, columns=columns, show="headings",
-                                        height=12, style="Annot.Treeview")
-        style = ttk.Style(self)
-        style.configure("Annot.Treeview", font=("Segoe UI", 9))
+                                        height=12)
         self.annot_tree.heading("label", text="Label")
         self.annot_tree.heading("start", text="Start (s)")
         self.annot_tree.heading("dur", text="Dur (ms)")
