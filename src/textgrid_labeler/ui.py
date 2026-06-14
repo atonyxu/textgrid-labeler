@@ -34,6 +34,10 @@ class UIBuilder:
         edit_menu.add_command(label="Redo", command=self._redo, accelerator="Ctrl+Y")
         menubar.add_cascade(label="Edit", menu=edit_menu)
 
+        self.project_menu = tk.Menu(menubar, tearoff=0)
+        menubar.add_cascade(label="Project", menu=self.project_menu)
+        self._update_project_menu()
+
         help_menu = tk.Menu(menubar, tearoff=0)
         help_menu.add_command(label="User Guide", command=self._show_help)
         help_menu.add_separator()
@@ -59,6 +63,29 @@ class UIBuilder:
             name = _os.path.basename(path)
             self.recent_menu.add_command(
                 label=name, command=lambda p=path: self._open_recent(p)
+            )
+
+    def _update_project_menu(self):
+        self.project_menu.delete(0, "end")
+        if not self.textgrid_path:
+            self.project_menu.add_command(label="(no file open)", state=tk.DISABLED)
+            return
+        d = _os.path.dirname(self.textgrid_path)
+        if not d:
+            self.project_menu.add_command(label="(no directory)", state=tk.DISABLED)
+            return
+        files = sorted(f for f in _os.listdir(d)
+                       if f.lower().endswith(".textgrid"))
+        if not files:
+            self.project_menu.add_command(label="(no other TextGrid files)", state=tk.DISABLED)
+            return
+        current = _os.path.basename(self.textgrid_path)
+        for fname in files:
+            if fname == current:
+                continue
+            full = _os.path.join(d, fname)
+            self.project_menu.add_command(
+                label=fname, command=lambda p=full: self._load_textgrid(p)
             )
 
     def _build_toolbar(self):

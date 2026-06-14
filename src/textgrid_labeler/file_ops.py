@@ -23,7 +23,23 @@ class FileOperationsMixin:
                 return c
         return ""
 
+    def _confirm_discard(self) -> bool:
+        if not self.modified:
+            return True
+        result = messagebox.askyesnocancel(
+            "Unsaved Changes",
+            "You have unsaved changes. Save before opening another file?"
+        )
+        if result is None:
+            return False
+        if result:
+            self._save_textgrid()
+            return not self.modified
+        return True
+
     def _load_textgrid(self, path: str) -> bool:
+        if not self._confirm_discard():
+            return False
         try:
             self.textgrid = textgrid.TextGrid.fromFile(path)
             self.textgrid_path = path
@@ -38,6 +54,7 @@ class FileOperationsMixin:
 
             self._add_recent(path)
             self._on_data_loaded()
+            self._update_project_menu()
             self.set_status(f"Opened: {os.path.basename(path)}")
             return True
         except Exception as e:
