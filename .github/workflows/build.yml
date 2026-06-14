@@ -1,0 +1,68 @@
+name: Build
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            noconsole: --noconsole
+            ext: .exe
+            artifact: TextGrid-Labeler-win-x86_64
+
+          - os: macos-latest
+            noconsole: --noconsole
+            ext: ""
+            artifact: TextGrid-Labeler-macos-arm64
+
+          - os: ubuntu-latest
+            noconsole: ""
+            ext: ""
+            artifact: TextGrid-Labeler-linux-x86_64
+
+          - os: ubuntu-24.04-arm
+            noconsole: ""
+            ext: ""
+            artifact: TextGrid-Labeler-linux-arm64
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: System deps (Linux)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libxcb-xinerama0 libxkbcommon-x11-0
+
+      - name: Install Python deps
+        run: pip install numpy textgrid pyinstaller
+
+      - name: PyInstaller build
+        shell: bash
+        run: |
+          SEP=":"
+          [[ "$RUNNER_OS" == "Windows" ]] && SEP=";"
+          pyinstaller --onefile ${{ matrix.noconsole }} \
+            --add-data "src/textgrid_labeler/HELP.txt${SEP}textgrid_labeler/" \
+            --paths src \
+            --name "TextGrid-Labeler" \
+            run.py
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: dist/TextGrid-Labeler*
