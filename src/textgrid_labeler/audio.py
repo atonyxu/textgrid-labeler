@@ -4,7 +4,6 @@ import threading
 import io
 import tempfile
 import platform
-import librosa
 import soundfile as sf
 
 
@@ -66,8 +65,10 @@ class AudioData:
 
     def load(self, filepath: str):
         self.filepath = filepath
-        self.samples, self.sample_rate = librosa.load(filepath, sr=None, mono=True)
-        self.n_channels = 1
+        self.samples, self.sample_rate = sf.read(filepath, dtype='float32')
+        self.n_channels = self.samples.ndim > 1 and self.samples.shape[1] or 1
+        if self.samples.ndim > 1:
+            self.samples = self.samples.mean(axis=1)
         self.sample_width = 4
         self.n_frames = len(self.samples)
         self.duration = self.n_frames / self.sample_rate
