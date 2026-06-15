@@ -1,6 +1,6 @@
 import tkinter as tk
 
-import numpy as np
+import math
 
 
 class DrawingMixin:
@@ -74,7 +74,7 @@ class DrawingMixin:
         vis_end = self.visible_start + self.visible_duration
 
         tick_spacing = self._nice_number(self.visible_duration / 10)
-        t = np.ceil(self.visible_start / tick_spacing) * tick_spacing
+        t = math.ceil(self.visible_start / tick_spacing) * tick_spacing
         while t <= vis_end:
             x = int((t - self.visible_start) / self.visible_duration * w)
             if 0 <= x <= w:
@@ -127,10 +127,11 @@ class DrawingMixin:
         if n_points < 2:
             return
 
-        indices = np.linspace(0, len(chunk) - 1, n_points).astype(np.intp)
-        downsampled = chunk[indices]
+        step = (len(chunk) - 1) / (n_points - 1)
+        indices = [int(i * step) for i in range(n_points)]
+        downsampled = [chunk[i] for i in indices]
 
-        norm = downsampled / self.audio_data.max_possible * (h / 2 - 4)
+        norm = [s / self.audio_data.max_possible * (h / 2 - 4) for s in downsampled]
 
         coords = []
         for i in range(n_points):
@@ -230,7 +231,7 @@ class DrawingMixin:
     def _nice_number(self, x: float) -> float:
         if x == 0:
             return 1
-        exp = np.floor(np.log10(x))
+        exp = math.floor(math.log10(x))
         frac = x / (10 ** exp)
         if frac < 1.5:
             nice = 1.0

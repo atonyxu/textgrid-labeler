@@ -1,11 +1,11 @@
-import wave
-import numpy as np
 import os
 import subprocess
 import threading
 import io
 import tempfile
 import platform
+import librosa
+import soundfile as sf
 
 
 class AudioPlayer:
@@ -60,24 +60,18 @@ class AudioData:
         self.n_frames = 0
         self.duration = 0.0
         self.max_possible = 1.0
-        self.samples: np.ndarray = None
+        self.samples = None
         if filepath:
             self.load(filepath)
 
     def load(self, filepath: str):
         self.filepath = filepath
-        with wave.open(filepath, "rb") as wf:
-            self.sample_rate = wf.getframerate()
-            self.n_channels = wf.getnchannels()
-            self.sample_width = wf.getsampwidth()
-            self.n_frames = wf.getnframes()
-            self.duration = self.n_frames / self.sample_rate
-            self.max_possible = 2 ** (8 * self.sample_width - 1)
-            raw = wf.readframes(self.n_frames)
-            dtype = np.int16 if self.sample_width == 2 else np.int32 if self.sample_width == 4 else np.int8
-            self.samples = np.frombuffer(raw, dtype=dtype).astype(np.float32)
-            if self.n_channels > 1:
-                self.samples = self.samples.reshape(-1, self.n_channels).mean(axis=1)
+        self.samples, self.sample_rate = librosa.load(filepath, sr=None, mono=True)
+        self.n_channels = 1
+        self.sample_width = 4
+        self.n_frames = len(self.samples)
+        self.duration = self.n_frames / self.sample_rate
+        self.max_possible = 1.0
 
     def is_loaded(self) -> bool:
         return self.samples is not None and len(self.samples) > 0
@@ -92,7 +86,7 @@ class AudioData:
         self.max_possible = 1.0
         self.samples = None
 
-    def get_section(self, start_time: float, end_time: float) -> np.ndarray:
+    def get_section(self, start_time: float, end_time: float):
         if not self.is_loaded():
             return None
         start_frame = int(start_time * self.sample_rate)
@@ -107,14 +101,7 @@ class AudioData:
             return
         self._play_array(section)
 
-    def _play_array(self, samples: np.ndarray):
-        samples = np.clip(samples, -32768, 32767).astype(np.int16)
-
+    def _play_array(self, samples):
         buf = io.BytesIO()
-        with wave.open(buf, "wb") as wf:
-            wf.setnchannels(1)
-            wf.setsampwidth(2)
-            wf.setframerate(self.sample_rate)
-            wf.writeframes(samples.tobytes())
-
+        sf.write(buf, samples, self.sample_rate, format='WAV', subtype='PCM_16')
         AudioPlayer.play_wav_data(buf.getvalue())
