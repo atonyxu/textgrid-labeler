@@ -121,25 +121,39 @@ class DrawingMixin:
             return
 
         mid = h / 2
+        max_ampl = h / 2 - 4
         self.wave_canvas.create_line(0, mid, w, mid, fill="#333", width=1)
 
-        n_points = min(len(chunk), w * 2)
-        if n_points < 2:
+        n_pixels = w
+        if n_pixels < 2 or len(chunk) < 2:
             return
 
-        step = (len(chunk) - 1) / (n_points - 1)
-        indices = [int(i * step) for i in range(n_points)]
-        downsampled = [chunk[i] for i in indices]
+        samples_per_pixel = len(chunk) / n_pixels
 
-        norm = [s / self.audio_data.max_possible * (h / 2 - 4) for s in downsampled]
+        tops = []
+        bottoms = []
+        for i in range(n_pixels):
+            lo = int(i * samples_per_pixel)
+            hi = int((i + 1) * samples_per_pixel)
+            if hi <= lo:
+                hi = lo + 1
+            if hi > len(chunk):
+                hi = len(chunk)
+            column = chunk[lo:hi]
+            col_min = min(column)
+            col_max = max(column)
+            tops.append(mid - col_max * max_ampl)
+            bottoms.append(mid - col_min * max_ampl)
 
-        coords = []
-        for i in range(n_points):
-            x = (i / (n_points - 1)) * w
-            coords.append(x)
-            coords.append(mid - norm[i])
+        poly = []
+        for i in range(n_pixels):
+            poly.append(i)
+            poly.append(tops[i])
+        for i in range(n_pixels - 1, -1, -1):
+            poly.append(i)
+            poly.append(bottoms[i])
 
-        self.wave_canvas.create_line(*coords, fill=self.wave_color, width=1)
+        self.wave_canvas.create_polygon(*poly, fill=self.wave_color, outline="")
 
     def _draw_annotation_lines(self, w: int, h: int):
         tier = self._get_current_tier()
