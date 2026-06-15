@@ -26,6 +26,8 @@ A cross-platform GUI tool for viewing and annotating [Praat](https://www.fon.hum
 | **Delete boundary** | Double-click a red boundary line to delete it and merge adjacent intervals |
 | **Add boundary** | Double-click inside an interval → dialog for label → new boundary created |
 | **Edit label** | Double-click a label in the annotation bar to edit its text |
+| **Select interval** | Click a label in the annotation bar to highlight the interval and select it in the right-side list |
+| **Interval context menu** | Right-click a label in the annotation bar for options: edit label, add marker at center, or delete the interval |
 
 ## Requirements
 
@@ -74,6 +76,8 @@ You can also pass a `.TextGrid` file path as a command-line argument to open it 
 | Double-click a red line | Delete boundary and merge intervals (keeps left label) |
 | Double-click inside an interval | Prompt for label → add new boundary |
 | Double-click a label in annotation bar | Edit the label text |
+| Click a label in annotation bar | Select interval: highlight in bar, select in right-side list, show interval info in status bar |
+| Right-click a label in annotation bar | Context menu: edit label, add marker at center, delete interval |
 | Right-click in an interval | Play that audio segment |
 | Click an item in the annotation list | Jump to and highlight that interval |
 | Mouse wheel | Scroll waveform |
