@@ -30,7 +30,8 @@ A cross-platform GUI tool for viewing and annotating [Praat](https://www.fon.hum
 ## Requirements
 
 - Python 3.8+
-- [numpy](https://pypi.org/project/numpy/)
+- [librosa](https://pypi.org/project/librosa/) (audio loading with high-precision float32)
+- [soundfile](https://pypi.org/project/soundfile/) (audio read/write via libsndfile)
 - [textgrid](https://pypi.org/project/textgrid/) (official Praat-TextGrid library)
 
 ## Installation
