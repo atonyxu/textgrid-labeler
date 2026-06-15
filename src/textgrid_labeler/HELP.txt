@@ -18,6 +18,8 @@
   • Click a label in tier bar                Select interval (highlight + list select + status info)
   • Right-click a label in tier bar          Context menu: change label, add boundary at center, remove interval
   • Right-click an interval in waveform      Play audio for that segment
+  • [ (bracket-open key on waveform)         Quick-add boundary at cursor position (same label as current interval)
+  • ] (bracket-close key on waveform)        Quick-delete current interval (merges with previous)
 
 [Search & Navigation]
   • Type keyword + press Enter    Search interval labels (substring match)

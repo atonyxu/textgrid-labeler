@@ -107,9 +107,12 @@ class EventHandlerMixin:
         else:
             self.wave_canvas.create_line(x, 0, x, h, fill="#ffcc00", dash=(3, 3), width=1, tags=("cursor",))
         self.wave_canvas.tag_raise("cursor")
+        self.hover_time = self._pixel_to_time(x)
+        self.wave_canvas.focus_set()
 
     def _on_canvas_leave(self, event):
         self.wave_canvas.delete("cursor")
+        self.hover_time = None
 
     def _on_canvas_click(self, event):
         if not self.textgrid:
@@ -410,6 +413,41 @@ class EventHandlerMixin:
         self.visible_duration = new_duration
 
         self._update_view()
+
+    def _on_bracket_open(self, event):
+        if not self.textgrid or self.hover_time is None:
+            return
+        tier = self._get_current_tier()
+        if not tier or not hasattr(tier, "intervals"):
+            return
+
+        idx = self._find_interval_at_time(self.hover_time)
+        if idx < 0:
+            return
+
+        interval = tier.intervals[idx]
+        click_time = self.hover_time
+        if click_time <= interval.minTime + 0.001 or click_time >= interval.maxTime - 0.001:
+            return
+
+        self._add_annotation_boundary(idx, click_time, interval.mark)
+
+    def _on_bracket_close(self, event):
+        if not self.textgrid or self.hover_time is None:
+            return
+        tier = self._get_current_tier()
+        if not tier or not hasattr(tier, "intervals"):
+            return
+
+        idx = self._find_interval_at_time(self.hover_time)
+        if idx < 0:
+            return
+
+        if len(tier.intervals) <= 1:
+            self.set_status("Cannot delete: at least one interval must remain.")
+            return
+
+        self._delete_interval(idx)
 
     def _add_annotation_boundary(self, interval_idx: int, time: float, text: str = ""):
         tier = self._get_current_tier()

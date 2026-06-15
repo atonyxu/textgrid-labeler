@@ -73,6 +73,9 @@ class TextGridLabeler(
         self.drag_min_time: float = 0.0
         self.drag_max_time: float = 0.0
 
+        # Hover time (tracked for keyboard shortcuts)
+        self.hover_time: Optional[float] = None
+
         # Playback cursor state
         import time as _time
         self._time = _time
