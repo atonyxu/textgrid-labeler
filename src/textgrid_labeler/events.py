@@ -1,4 +1,4 @@
-from tkinter import simpledialog, messagebox
+from tkinter import simpledialog, messagebox, Menu
 from typing import List, Tuple
 
 import textgrid
@@ -212,6 +212,142 @@ class EventHandlerMixin:
             self.dragging = False
             self._populate_annotation_list()
             self.set_status("Boundary updated")
+
+    def _on_annot_click(self, event):
+        if not self.textgrid:
+            return
+        w = self.annot_canvas.winfo_width()
+        if w <= 0:
+            return
+        click_time = self.visible_start + (event.x / w) * self.visible_duration
+        tier = self._get_current_tier()
+        if not tier or not hasattr(tier, "intervals"):
+            return
+
+        idx = self._find_interval_at_time(click_time)
+        if idx < 0:
+            return
+
+        query = self.search_var.get().strip().lower()
+        if query:
+            interval = tier.intervals[idx]
+            if query not in interval.mark.lower():
+                self.search_var.set("")
+                self.search_results = []
+                self.search_index = -1
+                self._update_search_display(redraw=False)
+                self._populate_annotation_list()
+
+        self.annot_tree.selection_set(str(idx))
+        self.annot_tree.see(str(idx))
+
+        interval = tier.intervals[idx]
+        if self.audio_data.is_loaded():
+            self.set_status(
+                f"Selected: [{interval.minTime:.3f}s - {interval.maxTime:.3f}s] "
+                f"\"{interval.mark}\". Right-click to play."
+            )
+        else:
+            self.set_status(
+                f"Selected: [{interval.minTime:.3f}s - {interval.maxTime:.3f}s] "
+                f"\"{interval.mark}\"."
+            )
+
+    def _on_annot_right_click(self, event):
+        if not self.textgrid:
+            return
+        w = self.annot_canvas.winfo_width()
+        if w <= 0:
+            return
+        click_time = self.visible_start + (event.x / w) * self.visible_duration
+        tier = self._get_current_tier()
+        if not tier or not hasattr(tier, "intervals"):
+            return
+
+        idx = self._find_interval_at_time(click_time)
+        if idx < 0:
+            return
+
+        menu = Menu(self, tearoff=0)
+        menu.add_command(
+            label="Edit label",
+            command=lambda: self._edit_interval_label(idx)
+        )
+        menu.add_command(
+            label="Add marker at center",
+            command=lambda: self._add_marker_at_center(idx)
+        )
+        menu.add_command(
+            label="Delete interval",
+            command=lambda: self._delete_interval(idx)
+        )
+        menu.post(event.x_root, event.y_root)
+
+    def _edit_interval_label(self, interval_idx: int):
+        tier = self._get_current_tier()
+        if not tier or interval_idx >= len(tier.intervals):
+            return
+        interval = tier.intervals[interval_idx]
+        new_text = simpledialog.askstring(
+            "Edit Label",
+            f"Edit label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
+            initialvalue=interval.mark,
+            parent=self
+        )
+        if new_text is not None and new_text != interval.mark:
+            self._save_state()
+            interval.mark = new_text
+            self.modified = True
+            self.selected_idx = -1
+            self._update_view()
+            self._populate_annotation_list()
+            self.set_status(f"Label updated: {new_text}")
+
+    def _add_marker_at_center(self, interval_idx: int):
+        tier = self._get_current_tier()
+        if not tier or interval_idx >= len(tier.intervals):
+            return
+        interval = tier.intervals[interval_idx]
+        center = (interval.minTime + interval.maxTime) / 2
+
+        new_text = simpledialog.askstring(
+            "New Annotation",
+            f"Enter label for new annotation at {center:.3f}s:",
+            initialvalue=interval.mark,
+            parent=self
+        )
+        if new_text is not None:
+            self._add_annotation_boundary(interval_idx, center, new_text)
+
+    def _delete_interval(self, interval_idx: int):
+        tier = self._get_current_tier()
+        if not tier or interval_idx >= len(tier.intervals):
+            return
+        if len(tier.intervals) <= 1:
+            self.set_status("Cannot delete: at least one interval must remain.")
+            return
+
+        interval = tier.intervals[interval_idx]
+        if not messagebox.askyesno(
+            "Delete Interval",
+            f"Delete interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s] "
+            f"\"{interval.mark}\"? This will merge adjacent intervals."
+        ):
+            return
+
+        self._save_state()
+
+        if interval_idx == 0:
+            tier.intervals[1].minTime = interval.minTime
+        else:
+            tier.intervals[interval_idx - 1].maxTime = interval.maxTime
+        del tier.intervals[interval_idx]
+
+        self.modified = True
+        self.selected_idx = -1
+        self._update_view()
+        self._populate_annotation_list()
+        self.set_status(f"Deleted interval: \"{interval.mark}\"")
 
     def _on_annot_double_click(self, event):
         if not self.textgrid:

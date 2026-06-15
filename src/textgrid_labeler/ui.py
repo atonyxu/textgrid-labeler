@@ -215,6 +215,8 @@ class UIBuilder:
         self.wave_canvas.bind("<Motion>", self._on_canvas_motion)
         self.wave_canvas.bind("<Leave>", self._on_canvas_leave)
 
+        self.annot_canvas.bind("<Button-1>", self._on_annot_click)
+        self.annot_canvas.bind("<Button-3>", self._on_annot_right_click)
         self.annot_canvas.bind("<Double-Button-1>", self._on_annot_double_click)
 
         self.wave_canvas.bind("<MouseWheel>", self._on_mousewheel)
