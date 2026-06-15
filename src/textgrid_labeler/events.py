@@ -12,7 +12,7 @@ class EventHandlerMixin:
             return self.visible_start
         effective_w = w - self.ruler_w
         px = max(0, min(px, effective_w - 1))
-        return self.visible_start + (px / effective_w) * self.visible_duration
+        return self.visible_start + (px / w) * self.visible_duration
 
     def _get_all_boundaries(self, tier) -> List[float]:
         boundaries = set()
