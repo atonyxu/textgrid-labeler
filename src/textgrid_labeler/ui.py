@@ -212,6 +212,8 @@ class UIBuilder:
         self.wave_canvas.bind("<Double-Button-1>", self._on_canvas_double_click)
         self.wave_canvas.bind("<B1-Motion>", self._on_canvas_drag)
         self.wave_canvas.bind("<ButtonRelease-1>", self._on_canvas_release)
+        self.wave_canvas.bind("<Motion>", self._on_canvas_motion)
+        self.wave_canvas.bind("<Leave>", self._on_canvas_leave)
 
         self.annot_canvas.bind("<Double-Button-1>", self._on_annot_double_click)
 

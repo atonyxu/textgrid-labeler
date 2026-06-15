@@ -98,6 +98,19 @@ class EventHandlerMixin:
         self._populate_annotation_list()
         self.set_status("Redo")
 
+    def _on_canvas_motion(self, event):
+        x = event.x
+        h = self.wave_canvas.winfo_height()
+        items = self.wave_canvas.find_withtag("cursor")
+        if items:
+            self.wave_canvas.coords(items[0], x, 0, x, h)
+        else:
+            self.wave_canvas.create_line(x, 0, x, h, fill="#ffcc00", dash=(3, 3), width=1, tags=("cursor",))
+        self.wave_canvas.tag_raise("cursor")
+
+    def _on_canvas_leave(self, event):
+        self.wave_canvas.delete("cursor")
+
     def _on_canvas_click(self, event):
         if not self.textgrid:
             return
