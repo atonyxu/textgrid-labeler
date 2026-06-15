@@ -103,7 +103,7 @@ class UIBuilder:
         left_frame = tk.Frame(toolbar)
         left_frame.pack(side=tk.LEFT, padx=8, pady=4)
 
-        tk.Label(left_frame, text="Layer:",
+        tk.Label(left_frame, text="Tier:",
                  font=("Segoe UI", 10)).pack(side=tk.LEFT, padx=(0, 4))
 
         self.layer_var = tk.StringVar()
@@ -166,7 +166,7 @@ class UIBuilder:
         header = tk.Frame(panel, bg="#e0e0e0")
         header.pack(side=tk.TOP, fill=tk.X)
 
-        tk.Label(header, text="Annotations", font=("Segoe UI", 10, "bold"),
+        tk.Label(header, text="Intervals", font=("Segoe UI", 10, "bold"),
                  bg="#e0e0e0").pack(side=tk.LEFT, padx=8, pady=4)
 
         columns = ("label", "start", "dur")

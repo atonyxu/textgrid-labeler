@@ -40,7 +40,7 @@ class ViewManagerMixin:
             self._update_search_display(redraw=False)
             self._update_view()
             self._populate_annotation_list()
-            self.set_status(f"Selected layer: {self.layer_combo.get()}")
+            self.set_status(f"Selected tier: {self.layer_combo.get()}")
 
     def _on_resize(self, event=None):
         self._update_view()
@@ -155,8 +155,8 @@ class ViewManagerMixin:
         interval = tier.intervals[idx]
         from tkinter import simpledialog
         new_text = simpledialog.askstring(
-            "Edit Label",
-            f"Edit label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
+            "Change label",
+            f"Change label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
             initialvalue=interval.mark,
             parent=self
         )
@@ -167,4 +167,4 @@ class ViewManagerMixin:
             self.selected_idx = -1
             self._update_view()
             self._populate_annotation_list()
-            self.set_status(f"Label updated: {new_text}")
+            self.set_status(f"Label changed: {new_text}")

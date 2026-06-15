@@ -157,8 +157,8 @@ class EventHandlerMixin:
                 return
             for i, iv in enumerate(tier.intervals):
                 if abs(iv.maxTime - bound_time) < 0.001:
-                    if not messagebox.askyesno("Delete Boundary",
-                                               f"Delete boundary at {bound_time:.3f}s and merge intervals?"):
+                    if not messagebox.askyesno("Remove boundary",
+                                               f"Remove boundary at {bound_time:.3f}s and merge intervals?"):
                         return
                     self._save_state()
                     right = tier.intervals[i + 1]
@@ -168,7 +168,7 @@ class EventHandlerMixin:
                     self.selected_idx = -1
                     self._update_view()
                     self._populate_annotation_list()
-                    self.set_status(f"Deleted boundary at {bound_time:.3f}s")
+                    self.set_status(f"Removed boundary at {bound_time:.3f}s")
                     return
             return
 
@@ -178,8 +178,8 @@ class EventHandlerMixin:
 
         interval = tier.intervals[interval_idx]
         new_text = simpledialog.askstring(
-            "New Annotation",
-            f"Enter label for new annotation at {click_time:.3f}s:",
+            "Add boundary",
+            f"Enter label for new interval at {click_time:.3f}s:",
             initialvalue=interval.mark,
             parent=self
         )
@@ -270,15 +270,15 @@ class EventHandlerMixin:
 
         menu = Menu(self, tearoff=0)
         menu.add_command(
-            label="Edit label",
+            label="Change label",
             command=lambda: self._edit_interval_label(idx)
         )
         menu.add_command(
-            label="Add marker at center",
+            label="Add boundary at center",
             command=lambda: self._add_marker_at_center(idx)
         )
         menu.add_command(
-            label="Delete interval",
+            label="Remove interval",
             command=lambda: self._delete_interval(idx)
         )
         menu.post(event.x_root, event.y_root)
@@ -289,8 +289,8 @@ class EventHandlerMixin:
             return
         interval = tier.intervals[interval_idx]
         new_text = simpledialog.askstring(
-            "Edit Label",
-            f"Edit label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
+            "Change label",
+            f"Change label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
             initialvalue=interval.mark,
             parent=self
         )
@@ -301,7 +301,7 @@ class EventHandlerMixin:
             self.selected_idx = -1
             self._update_view()
             self._populate_annotation_list()
-            self.set_status(f"Label updated: {new_text}")
+            self.set_status(f"Label changed: {new_text}")
 
     def _add_marker_at_center(self, interval_idx: int):
         tier = self._get_current_tier()
@@ -311,8 +311,8 @@ class EventHandlerMixin:
         center = (interval.minTime + interval.maxTime) / 2
 
         new_text = simpledialog.askstring(
-            "New Annotation",
-            f"Enter label for new annotation at {center:.3f}s:",
+            "Add boundary",
+            f"Enter label for new interval at {center:.3f}s:",
             initialvalue=interval.mark,
             parent=self
         )
@@ -329,8 +329,8 @@ class EventHandlerMixin:
 
         interval = tier.intervals[interval_idx]
         if not messagebox.askyesno(
-            "Delete Interval",
-            f"Delete interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s] "
+            "Remove interval",
+            f"Remove interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s] "
             f"\"{interval.mark}\"? This will merge adjacent intervals."
         ):
             return
@@ -347,7 +347,7 @@ class EventHandlerMixin:
         self.selected_idx = -1
         self._update_view()
         self._populate_annotation_list()
-        self.set_status(f"Deleted interval: \"{interval.mark}\"")
+        self.set_status(f"Removed interval: \"{interval.mark}\"")
 
     def _on_annot_double_click(self, event):
         if not self.textgrid:
@@ -366,8 +366,8 @@ class EventHandlerMixin:
 
         interval = tier.intervals[idx]
         new_text = simpledialog.askstring(
-            "Edit Label",
-            f"Edit label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
+            "Change label",
+            f"Change label for interval [{interval.minTime:.3f}s - {interval.maxTime:.3f}s]:",
             initialvalue=interval.mark,
             parent=self
         )
@@ -378,7 +378,7 @@ class EventHandlerMixin:
             self.selected_idx = -1
             self._update_view()
             self._populate_annotation_list()
-            self.set_status(f"Label updated: {new_text}")
+            self.set_status(f"Label changed: {new_text}")
 
     def _on_mousewheel(self, event):
         delta = event.delta / 120

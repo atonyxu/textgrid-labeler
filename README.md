@@ -13,21 +13,21 @@ A cross-platform GUI tool for viewing and annotating [Praat](https://www.fon.hum
 | **Undo / Redo** | Full undo/redo history (Ctrl+Z / Ctrl+Y) |
 | **Recent Files** | Persistent list of recently opened files |
 | **Project menu** | Quick-switch between all `.TextGrid` files in the current file's directory |
-| **Layer selector** | Switch between multiple tiers (IntervalTier / TextTier) |
-| **Search** | Enter a keyword, press Enter to find matching labels (substring); navigate with ◀ ▶ buttons; results highlighted in waveform and annotation bar |
-| **Annotation list** | Right-side panel shows all intervals (Label / Start / Dur); click to jump and highlight |
-| **Annotation bar** | Colored intervals with bold labels between timeline markers; search/selection highlighted |
+| **Tier selector** | Switch between multiple tiers (IntervalTier / TextTier) |
+| **Search** | Enter a keyword, press Enter to find matching labels (substring); navigate with ◀ ▶ buttons; results highlighted in waveform and tier bar |
+| **Intervals list** | Right-side panel shows all intervals (Label / Start / Dur); click to jump and highlight |
+| **Tier bar** | Colored intervals with bold labels between timeline markers; search/selection highlighted |
 | **Waveform display** | True-amplitude waveform rendering with dB ruler (right side) |
 | **Time ruler** | Tick marks with seconds display above the waveform |
 | **Scrollbar** | Navigate long audio; default view is 5 seconds |
 | **Zoom / Scroll** | Mouse wheel to scroll, Ctrl+wheel to zoom (centered on cursor) |
 | **Right-click play** | Right-click an interval to play that segment; playback cursor sweeps through waveform |
 | **Drag boundaries** | Left-click and drag red annotation lines to adjust time boundaries |
-| **Delete boundary** | Double-click a red boundary line to delete it and merge adjacent intervals |
+| **Remove boundary** | Double-click a red boundary line to remove it and merge adjacent intervals |
 | **Add boundary** | Double-click inside an interval → dialog for label → new boundary created |
-| **Edit label** | Double-click a label in the annotation bar to edit its text |
-| **Select interval** | Click a label in the annotation bar to highlight the interval and select it in the right-side list |
-| **Interval context menu** | Right-click a label in the annotation bar for options: edit label, add marker at center, or delete the interval |
+| **Change label** | Double-click a label in the tier bar to change its text |
+| **Select interval** | Click a label in the tier bar to highlight the interval and select it in the right-side list |
+| **Interval context menu** | Right-click a label in the tier bar for options: change label, add boundary at center, or remove the interval |
 
 ## Requirements
 
@@ -73,13 +73,13 @@ You can also pass a `.TextGrid` file path as a command-line argument to open it 
 |---|---|
 | Left-click near a red line | Start dragging the boundary |
 | Drag a red line | Move the annotation boundary (constrained by neighbours) |
-| Double-click a red line | Delete boundary and merge intervals (keeps left label) |
+| Double-click a red line | Remove boundary and merge intervals (keeps left label) |
 | Double-click inside an interval | Prompt for label → add new boundary |
-| Double-click a label in annotation bar | Edit the label text |
-| Click a label in annotation bar | Select interval: highlight in bar, select in right-side list, show interval info in status bar |
-| Right-click a label in annotation bar | Context menu: edit label, add marker at center, delete interval |
+| Double-click a label in tier bar | Change the label text |
+| Click a label in tier bar | Select interval: highlight in bar, select in right-side list, show interval info in status bar |
+| Right-click a label in tier bar | Context menu: change label, add boundary at center, remove interval |
 | Right-click in an interval | Play that audio segment |
-| Click an item in the annotation list | Jump to and highlight that interval |
+| Click an item in the intervals list | Jump to and highlight that interval |
 | Mouse wheel | Scroll waveform |
 | Ctrl + mouse wheel | Zoom in / out (centered on cursor) |
 
@@ -97,8 +97,8 @@ textgrid-labeler/
 │       ├── app.py                  # Main class (combines all mixins)
 │       ├── ui.py                   # Menu, toolbar, canvases, annotation list
 │       ├── file_ops.py             # Open / save / recent files / new file
-│       ├── view.py                 # Data loading, layer switching, list population
-│       ├── drawing.py              # Waveform, annotation bar, ruler, dB scale
+│   ├── view.py                 # Data loading, tier switching, list population
+│   ├── drawing.py              # Waveform, tier bar, ruler, dB scale
 │       ├── events.py               # Mouse/keyboard events, drag, undo/redo
 │       ├── search.py               # Search, navigation, result display
 │       ├── playback.py             # Audio playback cursor

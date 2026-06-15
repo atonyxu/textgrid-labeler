@@ -12,20 +12,20 @@
 
 [Annotation Editing]
   • Click & drag a red boundary line         Adjust boundary position
-  • Double-click a red boundary line         Delete boundary (merges intervals, keeps left label)
+  • Double-click a red boundary line         Remove boundary (merges intervals, keeps left label)
   • Double-click inside an interval          Add new boundary (prompts for label)
-  • Double-click a label in annotation bar   Edit interval label
-  • Click a label in annotation bar          Select interval (highlight + list select + status info)
-  • Right-click a label in annotation bar    Context menu: edit label, add marker at center, delete interval
+  • Double-click a label in tier bar         Change interval label
+  • Click a label in tier bar                Select interval (highlight + list select + status info)
+  • Right-click a label in tier bar          Context menu: change label, add boundary at center, remove interval
   • Right-click an interval in waveform      Play audio for that segment
 
 [Search & Navigation]
   • Type keyword + press Enter    Search interval labels (substring match)
   • ◀ / ▶ buttons                 Jump to previous / next search result
-  • Click annotation list item    Jump to and highlight that interval
+  • Click intervals list item    Jump to and highlight that interval
   • Count label                   Shows "N/M" for current search position
 
-[Annotation List (right panel)]
+[Intervals List (right panel)]
   • Three columns: Label, Start (s), Dur (ms)
   • Automatically filters when search is active
   • Click any item to jump to and highlight that interval
@@ -42,8 +42,8 @@
   • Ctrl+Y    Redo last undone edit
   • History   Up to 100 steps; cleared when opening a new file
 
-[Layer Switching]
-  • Dropdown in toolbar   Switch the current editing layer (tier)
+[Tier Switching]
+  • Dropdown in toolbar   Switch the current editing tier
 
 [FAQ]
   • WAV auto-load priority for a TextGrid at path/to/file.TextGrid:
