@@ -122,19 +122,22 @@ class DrawingMixin:
 
         mid = h / 2
         max_ampl = h / 2 - 4
-        self.wave_canvas.create_line(0, mid, w, mid, fill="#333", width=1)
 
         n_pixels = w
         if n_pixels < 2 or len(chunk) < 2:
+            self.wave_canvas.create_line(0, mid, w, mid, fill="#333", width=1)
             return
 
         samples_per_pixel = len(chunk) / n_pixels
 
-        tops = []
-        bottoms = []
-        for i in range(n_pixels):
-            lo = int(i * samples_per_pixel)
-            hi = int((i + 1) * samples_per_pixel)
+        fg = (0x4f, 0xc3, 0xf7)
+        bg = (0x1e, 0x1e, 0x1e)
+
+        raw = bytearray([bg[0], bg[1], bg[2]]) * (w * h)
+
+        for x in range(n_pixels):
+            lo = int(x * samples_per_pixel)
+            hi = int((x + 1) * samples_per_pixel)
             if hi <= lo:
                 hi = lo + 1
             if hi > len(chunk):
@@ -142,18 +145,24 @@ class DrawingMixin:
             column = chunk[lo:hi]
             col_min = min(column)
             col_max = max(column)
-            tops.append(mid - col_max * max_ampl)
-            bottoms.append(mid - col_min * max_ampl)
+            y1 = int(mid - col_max * max_ampl)
+            y2 = int(mid - col_min * max_ampl)
+            if y1 > y2:
+                y1, y2 = y2, y1
+            if y1 < 0:
+                y1 = 0
+            if y2 >= h:
+                y2 = h - 1
+            for y in range(y1, y2 + 1):
+                i = (y * w + x) * 3
+                raw[i] = fg[0]
+                raw[i + 1] = fg[1]
+                raw[i + 2] = fg[2]
 
-        poly = []
-        for i in range(n_pixels):
-            poly.append(i)
-            poly.append(tops[i])
-        for i in range(n_pixels - 1, -1, -1):
-            poly.append(i)
-            poly.append(bottoms[i])
-
-        self.wave_canvas.create_polygon(*poly, fill=self.wave_color, outline="")
+        ppm = b"P6\n" + str(w).encode() + b" " + str(h).encode() + b"\n255\n" + bytes(raw)
+        self._wave_photo = tk.PhotoImage(data=ppm)
+        self.wave_canvas.create_image(0, 0, image=self._wave_photo, anchor=tk.NW, tags=("wave_img",))
+        self.wave_canvas.create_line(0, mid, w, mid, fill="#333", width=1)
 
     def _draw_annotation_lines(self, w: int, h: int):
         tier = self._get_current_tier()
